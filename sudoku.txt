@@ -1,0 +1,90 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+// Function to display the Sudoku board
+void displayBoard(const vector<vector<int>>& board) {
+    for (int i = 0; i < 9; ++i) {
+        if (i % 3 == 0 && i != 0)
+            cout << "------+-------+------" << endl;
+        for (int j = 0; j < 9; ++j) {
+            if (j % 3 == 0 && j != 0)
+                cout << "| ";
+            if (board[i][j] == 0)
+                cout << ". ";
+            else
+                cout << board[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+// Function to check if placing a number at a specific position is valid
+bool isValid(const vector<vector<int>>& board, int row, int col, int num) {
+    // Check row and column
+    for (int i = 0; i < 9; ++i) {
+        if (board[row][i] == num || board[i][col] == num)
+            return false;
+    }
+
+    // Check 3x3 grid
+    int startRow = row - row % 3;
+    int startCol = col - col % 3;
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            if (board[i + startRow][j + startCol] == num)
+                return false;
+        }
+    }
+
+    return true;
+}
+
+// Function to check if the Sudoku puzzle has been solved
+bool isSolved(const vector<vector<int>>& board) {
+    for (int i = 0; i < 9; ++i) {
+        for (int j = 0; j < 9; ++j) {
+            if (board[i][j] == 0)
+                return false; // If any cell is empty, puzzle is not solved
+        }
+    }
+    return true;
+}
+
+int main() {
+    vector<vector<int>> board(9, vector<int>(9, 0)); // Initialize empty Sudoku board
+
+    cout << "Welcome to 2-Player Sudoku Game!" << endl;
+    cout << "Player 1 (X) starts. Player 2 (O) follows." << endl;
+
+    int currentPlayer = 1; // Player 1 starts
+    while (!isSolved(board)) {
+        cout << "Current Sudoku board:" << endl;
+        displayBoard(board);
+
+        int row, col, num;
+        cout << "Player " << currentPlayer << ", enter row, column, and number (1-9): ";
+        cin >> row >> col >> num;
+        row--; // Convert to zero-based indexing
+        col--; // Convert to zero-based indexing
+
+        if (row < 0 || row >= 9 || col < 0 || col >= 9 || num < 1 || num > 9 || board[row][col] != 0) {
+            cout << "Invalid move. Please try again." << endl;
+            continue;
+        }
+
+        if (isValid(board, row, col, num)) {
+            board[row][col] = num;
+            currentPlayer = (currentPlayer == 1) ? 2 : 1; // Switch player
+        } else {
+            cout << "Invalid number. Please try again." << endl;
+        }
+    }
+
+    cout << "Sudoku puzzle solved!" << endl;
+    cout << "Final Sudoku board:" << endl;
+    displayBoard(board);
+
+    return 0;
+}
